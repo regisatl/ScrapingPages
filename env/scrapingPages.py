@@ -25,8 +25,12 @@ def parseUrls(html):
 def main():
       base_url = "https://www.decathlon.fr/tous-les-sports/velo-cyclisme/velos"
       for x in range(0, 100):
+            
+            suffixe = f"?from=" + f"{x * 40}&size=40"
+            url = base_url + suffixe
+            
             print(f"Go to Web Page:{url}?from="+ f"{x * 40}&size=40")
-            html = getHtml(base_url, page=f"?from=" + f"{x * 40}&size=40")
+            html = getHtml(base_url, page=suffixe)
             if html is False:
                   break
             
