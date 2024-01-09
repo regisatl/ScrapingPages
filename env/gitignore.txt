@@ -1,0 +1,5 @@
+# Ignore les fichiers de log
+*.log
+
+# Ignore les répertoires
+/Lib
