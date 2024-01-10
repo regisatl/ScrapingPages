@@ -57,6 +57,7 @@ def main():
       for x in range(0, 1):
             
             suffixe = f"?from=" + f"{x * 40}&size=40"
+            
             url = base_url + suffixe
             
             print(f"Go to Web Page:{url}?from="+ f"{x * 40}&size=40")
