@@ -26,7 +26,6 @@ def getHtml(base_url, **kwargs):
       if kwargs.get("page") and html.css_first('div[data-supermodelid]') is None:
             print("Dernière Page: Fin du Scrapping")
             return False
-      print(html.css_first('h1').text())
       return html
 
 def parseUrls(html):
