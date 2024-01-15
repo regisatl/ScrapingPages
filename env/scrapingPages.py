@@ -1,8 +1,9 @@
-import httpx
 from selectolax.parser import HTMLParser
-from urllib.parse import urljoin
-import time
 from dataclasses import dataclass, asdict
+from urllib.parse import urljoin
+import pandas as pd
+import httpx
+import time
 
 @dataclass
 class Item:
@@ -26,12 +27,13 @@ def getHtml(base_url, **kwargs):
       if kwargs.get("page") and html.css_first('div[data-supermodelid]') is None:
             print("Dernière Page: Fin du Scrapping")
             return False
+      
       return html
 
 def parseUrls(html):
       produits = html.css('div[data-supermodelid]')
       for produit in produits:
-            yield(urljoin('https://www.decathlon.fr', produit.css_first(' a[class*="product-model-link"]').attributes['href']))
+            yield(urljoin('https://www.decathlon.fr', produit.css_first(' a[class*="product-model-link"]').attributes['href'] ))
 
 def extractData(html, sel):
       try:
@@ -50,16 +52,21 @@ def parseDetailedPages(html):
       )
       return asdict(newItem)
       
+def cleanData(produits):
+      df = pd.DataFrame(columns=produits[0].keys())
+      for produit in produits:
+            length = len(df)
+            df.loc[length] = produit
+      df["Référence"] = df["Référence"].str.replace("Ref. :", "", regex=False).str.strip()
+      df["Avis"] = df["Avis"].str.extract('(\d*\)')
 
 def main():
       produits = []
       base_url = "https://www.decathlon.fr/tous-les-sports/velo-cyclisme/velos"
+      
       for x in range(0, 1):
-            
             suffixe = f"?from=" + f"{x * 40}&size=40"
-            
             url = base_url + suffixe
-            
             print(f"Go to Web Page:{url}?from="+ f"{x * 40}&size=40")
             html = getHtml(base_url, page=suffixe)
             if html is False:
@@ -67,12 +74,14 @@ def main():
             time.sleep(1)
             
             urls = parseUrls(html)
-            for url in urls:
+            for url in urls[:3]:
                   print(f"Click item : {url}")
                   html = getHtml(url)
                   produits.append(parseDetailedPages(html))
                   print(f"ExtractData: {produits[-1]} ")
                   time.sleep(1)
+            
+            cleanData(produits)
 
 if __name__=="__main__":
       main()
